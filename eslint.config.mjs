@@ -31,8 +31,21 @@ const eslintConfig = [
         "error",
         {
           patterns: [
-            { group: ["@/features/users/**"], message: "Strict Boundary Violation: auth/ cannot import from users/. Compose at app/ level." },
-            { group: ["@/features/posts/**"], message: "Strict Boundary Violation: auth/ cannot import from posts/. Compose at app/ level." },
+            {
+              group: ["@/features/users/**"],
+              message:
+                "Strict Boundary Violation: auth/ cannot import from users/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/posts/**"],
+              message:
+                "Strict Boundary Violation: auth/ cannot import from posts/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/dashboard/**"],
+              message:
+                "Strict Boundary Violation: auth/ cannot import from dashboard/. Compose at app/ level.",
+            },
           ],
         },
       ],
@@ -45,8 +58,78 @@ const eslintConfig = [
         "error",
         {
           patterns: [
-            { group: ["@/features/auth/**"], message: "Strict Boundary Violation: users/ cannot import from auth/. Compose at app/ level." },
-            { group: ["@/features/posts/**"], message: "Strict Boundary Violation: users/ cannot import from posts/. Compose at app/ level." },
+            {
+              group: ["@/features/auth/**"],
+              message:
+                "Strict Boundary Violation: users/ cannot import from auth/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/posts/**"],
+              message:
+                "Strict Boundary Violation: users/ cannot import from posts/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/dashboard/**"],
+              message:
+                "Strict Boundary Violation: users/ cannot import from dashboard/. Compose at app/ level.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/features/posts/**/*.ts", "src/features/posts/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/features/auth/**"],
+              message:
+                "Strict Boundary Violation: posts/ cannot import from auth/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/users/**"],
+              message:
+                "Strict Boundary Violation: posts/ cannot import from users/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/dashboard/**"],
+              message:
+                "Strict Boundary Violation: posts/ cannot import from dashboard/. Compose at app/ level.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      "src/features/dashboard/**/*.ts",
+      "src/features/dashboard/**/*.tsx",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/features/auth/**"],
+              message:
+                "Strict Boundary Violation: dashboard/ cannot import from auth/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/users/**"],
+              message:
+                "Strict Boundary Violation: dashboard/ cannot import from users/. Compose at app/ level.",
+            },
+            {
+              group: ["@/features/posts/**"],
+              message:
+                "Strict Boundary Violation: dashboard/ cannot import from posts/. Compose at app/ level.",
+            },
           ],
         },
       ],

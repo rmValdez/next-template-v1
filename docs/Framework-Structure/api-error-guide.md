@@ -56,15 +56,15 @@ export class ApiError extends Error {
 
 **Classification table** (applied inside `http.ts`):
 
-| HTTP Status | Category       |
-| ----------- | -------------- |
-| 401         | `AUTH`         |
-| 403         | `FORBIDDEN`    |
-| 404         | `NOT_FOUND`    |
-| 422         | `VALIDATION`   |
-| 5xx         | `SERVER`       |
-| Network err | `NETWORK`      |
-| Other       | `UNKNOWN`      |
+| HTTP Status | Category     |
+| ----------- | ------------ |
+| 401         | `AUTH`       |
+| 403         | `FORBIDDEN`  |
+| 404         | `NOT_FOUND`  |
+| 422         | `VALIDATION` |
+| 5xx         | `SERVER`     |
+| Network err | `NETWORK`    |
+| Other       | `UNKNOWN`    |
 
 > **Rule**: No component or hook ever reads `res.status` directly. Classification happens once, in `http.ts`.
 

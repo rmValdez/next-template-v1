@@ -1,8 +1,10 @@
 # Beginner's Guide: Building a Feature
 
-Welcome to the team! This guide will walk you through building your very first feature in this architecture. 
+Welcome to the team! This guide will walk you through building your very first feature in this architecture.
 
-Our architecture is strict, but that strictness makes your job easier. You never have to guess *where* code goes. Let's build a simple "Posts" feature.
+Our architecture is strict, but that strictness makes your job easier. You never have to guess _where_ code goes. Let's build a simple "Products" feature.
+
+> 💡 **Tip**: The `posts` and `dashboard` features in this template are complete reference implementations you can copy from. This guide shows the same pattern from scratch.
 
 ## Step 1: Create the Feature Folder
 
@@ -10,11 +12,13 @@ Everything about a domain belongs in its own folder inside `src/features/`.
 **Feature Ownership Rule**: Each feature is fully responsible for its API layer, hooks, components, and types. No other feature or shared code should define business logic for it.
 
 Create a new directory for posts:
+
 ```bash
 src/features/posts/
 ```
 
 Inside this folder, create the standard structure:
+
 ```text
 src/features/posts/
 ├── api/             # Where we talk to the backend
@@ -70,8 +74,10 @@ export const postsKeys = {
   detail: (id: string) => [...postsKeys.all, "detail", id] as const,
 };
 ```
+
 };
-```
+
+````
 
 ## Step 4: Create the React Query Hook
 
@@ -90,7 +96,7 @@ export function usePosts() {
     queryFn: getPosts,
   });
 }
-```
+````
 
 > **Rule**: Always use `useSafeQuery` instead of raw `useQuery`. Never hardcode query keys — always use the feature's key factory.
 
@@ -168,6 +174,7 @@ export default function HomePage() {
 A feature is a self-contained "mini application" that consumes external data and renders UI based on it.
 
 Every feature has:
+
 - **input** (API)
 - **transformation** (hooks)
 - **output** (components)
@@ -175,15 +182,20 @@ Every feature has:
 Everything else is a consequence of these three parts.
 
 ### System Primitives
+
 The FAOS provides these global primitives — use them everywhere:
 
-| Primitive | What it does | How to use |
-| --- | --- | --- |
-| **RBAC** | Who can do what | `<Can permission="posts:create">` or `usePermissions().can()` |
-| **Feature Flags** | What UI exists | `useFeatureFlag("NEW_DASHBOARD")` |
-| **Pagination** | How lists scale | `usePagination()` — state lives in URL, not Zustand |
-| **Error Kernel** | How errors flow | Automatic via `useSafeQuery` / `useSafeMutation` |
-| **Zod Contracts** | API safety net | `Schema.parse(raw)` in every `*.client.ts` |
-| **Architecture Validator** | Build-time guard | `npm run validate` — blocks bad imports in CI |
+| Primitive                  | What it does     | How to use                                                    |
+| -------------------------- | ---------------- | ------------------------------------------------------------- |
+| **RBAC**                   | Who can do what  | `<Can permission="posts:create">` or `usePermissions().can()` |
+| **Feature Flags**          | What UI exists   | `useFeatureFlag("NEW_DASHBOARD")`                             |
+| **Pagination**             | How lists scale  | `usePagination()` — state lives in URL, not Zustand           |
+| **Error Kernel**           | How errors flow  | Automatic via `useSafeQuery` / `useSafeMutation`              |
+| **Zod Contracts**          | API safety net   | `Schema.parse(raw)` in every `*.client.ts`                    |
+| **Architecture Validator** | Build-time guard | `pnpm validate` — blocks bad imports in CI                    |
 
 You are now ready to build! 🚀
+
+---
+
+> 📖 **Next**: Read the [Engineering Handbook](./engineering-handbook.md) for the full rules, or the [Getting Started guide](./getting-started.md) for the clone → production workflow.

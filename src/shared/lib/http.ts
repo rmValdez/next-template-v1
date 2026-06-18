@@ -1,6 +1,16 @@
 import { ApiError } from "@/shared/errors/api-error";
+import { env } from "@/shared/lib/env";
 
-function classify(status: number): "AUTH" | "FORBIDDEN" | "VALIDATION" | "NOT_FOUND" | "SERVER" | "NETWORK" | "UNKNOWN" {
+function classify(
+  status: number,
+):
+  | "AUTH"
+  | "FORBIDDEN"
+  | "VALIDATION"
+  | "NOT_FOUND"
+  | "SERVER"
+  | "NETWORK"
+  | "UNKNOWN" {
   if (status === 401) return "AUTH";
   if (status === 403) return "FORBIDDEN";
   if (status === 404) return "NOT_FOUND";
@@ -9,10 +19,14 @@ function classify(status: number): "AUTH" | "FORBIDDEN" | "VALIDATION" | "NOT_FO
   return "UNKNOWN";
 }
 
-export async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
+export async function fetcher<T>(
+  url: string,
+  options?: RequestInit,
+): Promise<T> {
   try {
-    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}${url}`, {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${url}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -30,15 +44,11 @@ export async function fetcher<T>(url: string, options?: RequestInit): Promise<T>
 
       const category = classify(res.status);
 
-      throw new ApiError(
-        payload?.message || "Request failed",
-        category,
-        {
-          status: res.status,
-          code: payload?.code,
-          details: payload?.details,
-        }
-      );
+      throw new ApiError(payload?.message || "Request failed", category, {
+        status: res.status,
+        code: payload?.code,
+        details: payload?.details,
+      });
     }
 
     return res.json();

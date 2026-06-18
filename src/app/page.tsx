@@ -15,7 +15,15 @@ import {
   Moon,
   Sun,
   ArrowRight,
+  BarChart2,
+  FileText,
 } from "lucide-react";
+import { StatsCard } from "@/features/dashboard/components/StatsCard";
+import { RevenueChart } from "@/features/dashboard/components/RevenueChart";
+import { useDashboardStats } from "@/features/dashboard/hooks/useDashboardStats";
+import { PostList } from "@/features/posts/components/PostList";
+import { CreatePostForm } from "@/features/posts/components/CreatePostForm";
+import { usePosts } from "@/features/posts/hooks/posts.hooks";
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
@@ -107,7 +115,11 @@ export default function LandingPage() {
               onClick={toggleTheme}
               className="p-2.5 rounded-xl glass-light hover:bg-white/10 transition-colors border border-white/5"
             >
-              {isDark ? <Sun className="w-5 h-4" /> : <Moon className="w-5 h-4" />}
+              {isDark ? (
+                <Sun className="w-5 h-4" />
+              ) : (
+                <Moon className="w-5 h-4" />
+              )}
             </button>
             <button
               onClick={() => router.push("/auth")}
@@ -204,6 +216,12 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── Dashboard Feature Showcase ─────────────────────────────── */}
+        <DashboardShowcase />
+
+        {/* ── Posts Feature Showcase ─────────────────────────────────── */}
+        <PostsShowcase />
+
         {/* Call to Action */}
         <section className="py-32 px-6">
           <div className="max-w-5xl mx-auto rounded-[3rem] p-12 md:p-24 relative overflow-hidden text-center bg-brand-burgundy/20 border border-white/5">
@@ -241,13 +259,22 @@ export default function LandingPage() {
               © 2026 Boilerplate Labs. All rights reserved.
             </p>
             <div className="flex gap-8 text-sm font-bold text-text-tertiary">
-              <a href="#" className="hover:text-brand-vibrant transition-colors">
+              <a
+                href="#"
+                className="hover:text-brand-vibrant transition-colors"
+              >
                 Github
               </a>
-              <a href="#" className="hover:text-brand-vibrant transition-colors">
+              <a
+                href="#"
+                className="hover:text-brand-vibrant transition-colors"
+              >
                 Docs
               </a>
-              <a href="#" className="hover:text-brand-vibrant transition-colors">
+              <a
+                href="#"
+                className="hover:text-brand-vibrant transition-colors"
+              >
                 Templates
               </a>
             </div>
@@ -255,5 +282,87 @@ export default function LandingPage() {
         </footer>
       </div>
     </div>
+  );
+}
+
+// ── Dashboard Showcase ────────────────────────────────────────────────────────
+function DashboardShowcase() {
+  const { data, isLoading } = useDashboardStats();
+
+  return (
+    <section className="py-24 px-6 max-w-7xl mx-auto">
+      <div className="mb-12 flex items-center gap-3">
+        <BarChart2 className="w-7 h-7 text-brand-core" />
+        <div>
+          <h2 className="text-4xl font-bold">Dashboard Feature</h2>
+          <p className="text-text-tertiary text-sm mt-1">
+            Read-only data display with Recharts ·{" "}
+            <code className="text-xs bg-white/5 px-1.5 py-0.5 rounded">
+              useDashboardStats
+            </code>{" "}
+            hook
+          </p>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="h-32 rounded-2xl glass-light animate-pulse"
+            />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {data?.stats.map((stat, i) => (
+              <StatsCard key={stat.id} stat={stat} index={i} />
+            ))}
+          </div>
+          {data?.revenueChart && <RevenueChart data={data.revenueChart} />}
+        </>
+      )}
+    </section>
+  );
+}
+
+// ── Posts Showcase ────────────────────────────────────────────────────────────
+function PostsShowcase() {
+  const { data: posts, isLoading } = usePosts();
+
+  return (
+    <section className="py-24 px-6 max-w-7xl mx-auto">
+      <div className="mb-12 flex items-center gap-3">
+        <FileText className="w-7 h-7 text-brand-core" />
+        <div>
+          <h2 className="text-4xl font-bold">Posts Feature</h2>
+          <p className="text-text-tertiary text-sm mt-1">
+            Full CRUD with{" "}
+            <code className="text-xs bg-white/5 px-1.5 py-0.5 rounded">
+              useSafeMutation
+            </code>{" "}
+            · create + delete with automatic cache invalidation
+          </p>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-[1fr_2fr] gap-8 items-start">
+        <CreatePostForm />
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="h-20 rounded-2xl glass-light animate-pulse"
+              />
+            ))}
+          </div>
+        ) : (
+          <PostList posts={posts ?? []} />
+        )}
+      </div>
+    </section>
   );
 }
