@@ -13,6 +13,21 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/features/*/*"],
+              message: "Strict Boundary Violation: Features cannot import directly from other features. Use shared/ or app/."
+            }
+          ]
+        }
+      ]
+    }
+  }
 ]);
 
 export default eslintConfig;
