@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **RBAC** — `shared/auth/rbac.ts` pure engine + `usePermissions()` + `<Can>` component.
 - **Feature Flags** — `shared/flags/` with swappable `FlagEngine` adapter.
 - **URL-safe Pagination** — `usePagination()` binding page state to `useSearchParams`.
-- **Architecture Validator** — `tools/validate-architecture.mjs` AST scanner enforcing all boundary rules.
+- **Architecture Validator** — `tools/validate-architecture.mjs` static import-boundary scanner enforcing all boundary rules.
 - **Feature Manifests** — `feature.manifest.ts` per feature for CI-only dependency declarations.
 - **`auth` feature** — API-agnostic auth client adapter with `useAuthStore` and `AuthListener`.
 - **`users` feature** — Reference read feature with Zod contract, query key factory, and `useUsers` hook.

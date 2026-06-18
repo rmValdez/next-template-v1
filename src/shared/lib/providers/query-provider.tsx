@@ -45,6 +45,12 @@ export default function QueryProvider({
             if (result.toast) {
               toast.error(result.toast);
             }
+
+            if (result.action === "logout") {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+              }
+            }
           },
         }),
         defaultOptions: {
@@ -53,7 +59,7 @@ export default function QueryProvider({
             retry: (count, error) => count < getRetryCount(error),
           },
         },
-      })
+      }),
   );
 
   return (

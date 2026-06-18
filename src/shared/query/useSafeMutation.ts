@@ -1,6 +1,4 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { routeError } from "@/shared/errors/error-router";
-import { logError } from "@/shared/errors/use-error-telemetry";
 import { mapApiValidationToForm } from "@/shared/errors/map-validation";
 
 type UseSafeMutationOptions<
@@ -18,10 +16,14 @@ type UseSafeMutationOptions<
 
 /**
  * Drop-in replacement for useMutation.
- * Automatically:
- * - Routes errors through the FAOS error-router (toast, logout, etc.)
- * - Maps VALIDATION errors to form fields via onValidationError callback
- * - Logs all errors through the telemetry hook
+ *
+ * Logging, toasts, and logout-on-AUTH are handled globally by the
+ * MutationCache configured in `shared/lib/providers/query-provider.tsx` —
+ * this wrapper does NOT repeat them (doing so would double-toast / double-log).
+ *
+ * Its only added responsibility is mapping VALIDATION (422) errors to form
+ * fields via the `onValidationError` callback. VALIDATION errors are routed to
+ * `toast: null` globally, so they never produce a global toast.
  */
 export function useSafeMutation<
   TData = unknown,
@@ -33,25 +35,13 @@ export function useSafeMutation<
 
   return useMutation({
     ...rest,
-    onError: (error, variables, context) => {
-      logError(error);
+    onError: (error) => {
+      if (!onValidationError) return;
 
       const fields = mapApiValidationToForm(error);
 
-      if (Object.keys(fields).length > 0 && onValidationError) {
+      if (Object.keys(fields).length > 0) {
         onValidationError(fields);
-        return; // VALIDATION errors are handled by the form — skip global routing
-      }
-
-      const result = routeError(error);
-
-      if (result.toast) {
-        // Dynamically import to avoid coupling shared/ to toast library at module level
-        import("sonner").then(({ toast }) => toast.error(result.toast!));
-      }
-
-      if (result.action === "logout" && typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }
     },
   });

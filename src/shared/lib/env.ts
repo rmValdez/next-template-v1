@@ -13,7 +13,7 @@ const envSchema = z.object({
   // ── API ──────────────────────────────────────────────────────────────────
   /** Base URL of the backend REST API. Must be a valid URL. */
   NEXT_PUBLIC_API_URL: z
-    .string({ required_error: "NEXT_PUBLIC_API_URL is required." })
+    .string({ error: "NEXT_PUBLIC_API_URL is required." })
     .url({
       message:
         "NEXT_PUBLIC_API_URL must be a valid URL (e.g. https://api.example.com).",
@@ -30,10 +30,8 @@ const envSchema = z.object({
   /** Runtime environment name. Drives feature flag defaults. */
   NEXT_PUBLIC_APP_ENV: z
     .enum(["development", "staging", "production"], {
-      errorMap: () => ({
-        message:
-          "NEXT_PUBLIC_APP_ENV must be one of: development, staging, production.",
-      }),
+      error:
+        "NEXT_PUBLIC_APP_ENV must be one of: development, staging, production.",
     })
     .default("development"),
 });

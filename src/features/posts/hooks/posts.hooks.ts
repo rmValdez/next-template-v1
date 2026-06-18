@@ -14,10 +14,13 @@ export function usePosts() {
 }
 
 /** Create a new post. Invalidates the posts list on success. */
-export function useCreatePost() {
+export function useCreatePost(options?: {
+  onValidationError?: (fields: Record<string, string[]>) => void;
+}) {
   const queryClient = useQueryClient();
   return useSafeMutation({
     mutationFn: (input: CreatePostInput) => createPost(input),
+    onValidationError: options?.onValidationError,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postsKeys.lists() });
     },
