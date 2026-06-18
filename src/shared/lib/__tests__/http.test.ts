@@ -7,6 +7,7 @@ function mockFetch(status: number, body?: object) {
   global.fetch = vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
     status,
+    headers: new Headers(),
     json: async () => body ?? {},
   });
 }
@@ -30,6 +31,19 @@ describe("fetcher", () => {
     mockFetch(200, { id: "1", name: "Alice" });
     const result = await fetcher("/api/users");
     expect(result).toEqual({ id: "1", name: "Alice" });
+  });
+
+  it("resolves to undefined on a 204 No Content response (does not call json)", async () => {
+    const json = vi.fn();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: new Headers(),
+      json,
+    });
+    const result = await fetcher("/api/posts/1", { method: "DELETE" });
+    expect(result).toBeUndefined();
+    expect(json).not.toHaveBeenCalled();
   });
 
   it("attaches Authorization header when auth_token is in localStorage", async () => {
@@ -80,7 +94,7 @@ describe("fetcher", () => {
       message: "Validation failed",
       details: { email: ["is invalid"] },
     });
-    const error = await fetcher("/api/form").catch((e) => e);
+    const error: any = await fetcher("/api/form").catch((e) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect(error.category).toBe("VALIDATION");
     expect(error.details).toEqual({ email: ["is invalid"] });
@@ -96,7 +110,7 @@ describe("fetcher", () => {
 
   it("throws ApiError with NETWORK category on fetch TypeError", async () => {
     mockNetworkFailure();
-    const error = await fetcher("/api/users").catch((e) => e);
+    const error: any = await fetcher("/api/users").catch((e) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect(error.category).toBe("NETWORK");
     expect(error.message).toBe("Network error");
@@ -104,7 +118,7 @@ describe("fetcher", () => {
 
   it("preserves the error message from the API response body", async () => {
     mockFetch(400, { message: "Bad request: missing field" });
-    const error = await fetcher("/api/users").catch((e) => e);
+    const error: any = await fetcher("/api/users").catch((e) => e);
     expect(error.message).toBe("Bad request: missing field");
   });
 });

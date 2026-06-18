@@ -72,7 +72,7 @@ We treat Authentication as an external service. This template provides an **Auth
 
 - **Imports**: Absolute imports are strictly enforced. Use `@/app`, `@/features`, and `@/shared`. Never use generic `@/` or deep relative `../../` imports that cross boundaries.
 - **Linting**: `pnpm lint` enforces boundary rules via `eslint.config.mjs` (per-layer `no-restricted-imports`).
-- **Architecture Validator**: `pnpm validate` runs `tools/validate-architecture.mjs` — an AST-level scanner that blocks cross-feature imports and manifest violations. **Must pass in CI before build.**
+- **Architecture Validator**: `pnpm validate` runs `tools/validate-architecture.mjs` — a static import-boundary scanner that blocks cross-feature imports and manifest pollution. **Must pass in CI before build.**
 - **TypeScript**: `pnpm type-check` is the definitive compile-time check. Never silence type errors with `as any`.
 - **Naming**: API files follow `*.client.ts`. Hooks follow `use*.ts`. Components are `PascalCase`. Key factories follow `featureKeys.action()` pattern.
 - **Testing**: `pnpm test` runs the Vitest suite. All new features must include unit tests in `__tests__/` directories.
@@ -131,17 +131,18 @@ export const featureManifest = {
 - ❌ Never import `feature.manifest.ts` into the React tree.
 - ✅ CI-only artifact consumed by `validate-architecture.mjs`.
 
-### 9.2 Architecture Validator (`npm run validate`)
+### 9.2 Architecture Validator (`pnpm validate`)
 
-`tools/validate-architecture.mjs` is an AST scanner that enforces:
+`tools/validate-architecture.mjs` is a static import-boundary scanner (regex-based
+import extraction, not a full AST) that enforces:
 
-| Rule                  | What it catches                                    |
-| --------------------- | -------------------------------------------------- |
-| Cross-feature imports | `features/A` importing from `features/B`           |
-| `shared/` purity      | `shared/` importing `features/` or `app/`          |
-| `app/` discipline     | `app/` importing `@tanstack/react-query` directly  |
-| Manifest integrity    | Declared dependencies without matching manifests   |
-| Circular deps         | Feature A ↔ Feature B circular manifest dependency |
+| Rule                  | What it catches                                           |
+| --------------------- | --------------------------------------------------------- |
+| Cross-feature imports | `features/A` importing from `features/B`                  |
+| `shared/` purity      | `shared/` importing `features/` or `app/`                 |
+| `app/` discipline     | `app/` importing `@tanstack/react-query` directly         |
+| Import strategy       | Deep relative imports (`../../`) instead of `@/*` aliases |
+| Manifest pollution    | `feature.manifest.ts` imported into the runtime tree      |
 
 ```bash
 pnpm validate  # exit 0 = clean, exit 1 = build blocked

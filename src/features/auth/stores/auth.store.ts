@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { Role } from "@/shared/auth/roles";
+import { getToken, setToken, clearToken } from "@/shared/lib/token";
 
 export type UserIdentity = {
   id: string;
@@ -17,14 +18,14 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token: typeof window !== "undefined" ? localStorage.getItem("auth_token") : null,
+  token: getToken(),
   role: "viewer",
   user: null,
   setToken: (token) => {
     if (token) {
-      localStorage.setItem("auth_token", token);
+      setToken(token);
     } else {
-      localStorage.removeItem("auth_token");
+      clearToken();
     }
     set({ token });
   },

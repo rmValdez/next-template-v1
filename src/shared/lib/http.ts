@@ -1,5 +1,6 @@
 import { ApiError } from "@/shared/errors/api-error";
 import { env } from "@/shared/lib/env";
+import { getToken } from "@/shared/lib/token";
 
 function classify(
   status: number,
@@ -24,8 +25,7 @@ export async function fetcher<T>(
   options?: RequestInit,
 ): Promise<T> {
   try {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    const token = getToken();
     const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${url}`, {
       ...options,
       headers: {
@@ -49,6 +49,12 @@ export async function fetcher<T>(
         code: payload?.code,
         details: payload?.details,
       });
+    }
+
+    // 204 No Content / empty bodies (e.g. DELETE) have nothing to parse —
+    // calling res.json() on them throws. Resolve to undefined instead.
+    if (res.status === 204 || res.headers.get("content-length") === "0") {
+      return undefined as T;
     }
 
     return res.json();
